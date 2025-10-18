@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Property Tag Generator</title>
+
+    <!-- jQuery (required by DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="/css/index.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Property Tag Generator</h1>
+
+      <div class="card" id="formCard" aria-label="Form">
+        <div class="row">
+          <div class="col">
+            <label for="schoolName">Name of School</label>
+            <input id="schoolName" type="text" placeholder="e.g. San Isidro Elementary School" />
+          </div>
+
+          <div class="col">
+            <label for="validatorName">Name of Validator / Property Custodian</label>
+            <input id="validatorName" type="text" placeholder="e.g. Juan Dela Cruz" />
+          </div>
+
+          <div class="col">
+            <label for="position">Position</label>
+            <input id="position" type="text" placeholder="e.g. Property Custodian" />
+          </div>
+
+          <div class="col" style="flex: 0 0 140px">
+            <label for="logoUpload">Upload Logo</label>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <div class="logo-preview" id="logoPreview">Logo</div>
+              <div style="flex: 1">
+                <input id="logoUpload" type="file" accept="image/*" />
+                <div class="small hint">PNG/JPG, will appear on tags</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr style="margin: 12px 0; border: 0; border-top: 1px solid #eef2f7" />
+
+        <div class="row" style="align-items: center">
+          <div class="col" style="flex: 1 1 420px">
+            <label for="xlsxUpload">Upload Excel File (.xlsx)</label>
+            <input id="xlsxUpload" type="file" accept=".xlsx" />
+            <div class="small hint">First worksheet will be used. Header row determines columns.</div>
+          </div>
+
+          <div style="display: flex; gap: 8px; align-items: center">
+            <button id="downloadTemplate">Download Template</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="tableCard">
+        <div class="top-bar">
+          <div style="display: flex; gap: 8px; align-items: center">
+            <button id="generateBtn">Generate Property Tag</button>
+            <div class="tag-count" id="selectedCount">0 selected</div>
+          </div>
+
+          <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+            <!-- Page Size Selector -->
+            <div>
+              <label><strong>Page Size:</strong></label>
+              <select id="pageSize">
+                <option value="a4">A4 (8.27 × 11.69 in)</option>
+                <option value="letter">Letter (8.5 × 11 in)</option>
+                <option value="legal">Legal (8.5 × 14 in)</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+
+            <!-- Custom Size Inputs -->
+            <div id="customSizeInputs" style="display: none">
+              Width:
+              <input type="number" id="customWidth" value="8.27" step="0.1" style="width: 60px" />
+              in Height:
+              <input type="number" id="customHeight" value="11.69" step="0.1" style="width: 60px" />
+              in
+            </div>
+
+            <!-- Orientation Selector -->
+            <div>
+              <label><strong>Orientation:</strong></label>
+              <select id="pageOrientation">
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tableWrap" class="card" style="padding: 10px">
+      <table id="dataTable" class="display" style="width: 100%">
+        <thead>
+          <tr id="tableHeadRow">
+            <th style="width: 40px">
+              <input type="checkbox" id="selectAll" />
+            </th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="small hint">When you click "Generate Property Tag" a new page will open with printable tags for selected rows.</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <!-- SheetJS for XLSX read/write -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="/js/index.js"></script>
+  </body>
+</html>

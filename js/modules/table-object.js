@@ -6,9 +6,9 @@ export const defaultTable = function () {
         data: null,
         orderable: false,
         searchable: false,
-        render: function (data, type, row, meta) {
-          return `<input type = "checkbox" class = "row-checkbox" data-rowid ="${row.__rowId}">`;
-        },
+        // render: function (data, type, row, meta) {
+        //   return `<input type = "checkbox" class = "row-checkbox" data-rowid ="${row.__rowId}">`;
+        // },
       },
       // additional columns will be added dynamically when data loads
     ],

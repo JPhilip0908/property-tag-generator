@@ -4,8 +4,12 @@ import { defaultTable } from "./modules/table-object.js";
 
 let wbData = null;
 let table = null;
+let school = $.trim($("#schoolName").val());
+let validator = $.trim($("#validatorName").val());
+let position = $.trim($("#position").val());
 const chkSelectAll = $("#selectAll");
 const btnLogo = $("#logoUpload");
+const btnUpload = $("#xlsxUpload");
 const dataTable = $("#dataTable");
 let logoDataURL = null;
 let logoPreview = $("#logoPreview");
@@ -33,6 +37,7 @@ $("#dataTable tbody").on("change", "input.row-checkbox", function () {
   $("#selectAll").prop("checked", all > 0 && all === checked);
 });
 
+//upload logo
 btnLogo.on("change", function (event) {
   const file = event.target.files && event.target.files[0];
   if (!file) {
@@ -51,4 +56,16 @@ btnLogo.on("change", function (event) {
     img.src = logoDataURL;
   };
   reader.readAsDataURL(file);
+});
+
+//upload excel file
+btnUpload.on("change", function (event) {
+  const file = event.target.files && event.target.files[0];
+
+  if (!files) return;
+  if (!files.name.match(/\.xlsx$/i)) {
+    alert("Please upload an .xlsx file (Excel workbook).");
+    event.target.value = "";
+    return;
+  }
 });

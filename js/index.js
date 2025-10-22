@@ -1,6 +1,6 @@
 "use strict";
 
-import { defaultTable } from "./modules/table-object.js";
+import { defaultTable, cols } from "./modules/table-object.js";
 
 let wbData = null;
 let table = null;
@@ -68,4 +68,41 @@ btnUpload.on("change", function (event) {
     event.target.value = "";
     return;
   }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = e.target.result;
+    try {
+      const workBook = XLSX.read(data, { type: "binary" });
+      wbData = workBook;
+      const sheet = workBook.SheetNames[0];
+      const workSheet = workBook.Sheets[sheet];
+      const json = XLSX.utils.sheet_to_json(workSheet, {
+        defval: "",
+        raw: false,
+        range: 0,
+      });
+
+      if (json.length === 0) {
+        alert("The first sheet contains no data");
+        return;
+      }
+
+      const filteredJSON = json.map((row) => {
+        const filtered = {};
+        columns.forEach((col) => {
+          filtered[col] = row[col];
+        });
+        return filtered;
+      });
+
+      currentData = filteredJSON.map((row, index) => {
+        const clone = Object.assign({}, r);
+        clone._rowId = `r${idx + 1}_${Date.now()}`;
+        return clone;
+      });
+    } catch (err) {
+      alert(err);
+    }
+  };
 });

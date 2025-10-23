@@ -1,4 +1,4 @@
-export const cols = [
+export const colData = [
   {
     data: null,
     orderable: false,
@@ -12,7 +12,7 @@ export const cols = [
 export const defaultTable = function () {
   return {
     data: [],
-    columns: cols,
+    columns: colData,
     order: [],
     pageLength: 10,
     language: {

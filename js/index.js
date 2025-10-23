@@ -19,11 +19,12 @@ let headers = [];
 table = dataTable.DataTable(defaultTable());
 
 //select all rows when checked
-function toggleSelectAll() {
-  chkSelectAll.on("change", function () {
-    const checked = $(this).is(":checked");
-    $("#dataTable tbody input.row-checkbox").prop("checked", checked).trigger("change");
-  });
+function toggleSelectAll(event) {
+  const checked = $(this).is(":checked");
+  $("#dataTable tbody input.row-checkbox").prop("checked", checked).trigger("change");
+  console.log("chkSelectAll length:", $("#selectAll").length);
+  console.log("type of toggleSelectAll:", typeof toggleSelectAll);
+  console.log("is arrow function? try toggleSelectAll.prototype:", toggleSelectAll.prototype);
 }
 //update selected count
 function updateSelectedCount() {
@@ -31,14 +32,14 @@ function updateSelectedCount() {
   $("#selectedCount").text(count + " selected");
 }
 
+$("#dataTable tbody").on("change", "input.row-checkbox", delegateCheckBox);
+
 function delegateCheckBox() {
-  $("#dataTable tbody").on("change", "input.row-checkbox", function () {
-    updateSelectedCount();
-    //uncheck header select checkboxes if none were checked
-    const all = $("#dataTable tbody input.row-checkbox").length;
-    const checked = $("#dataTable tbody input.row-checkbox:checked").length;
-    $("#selectAll").prop("checked", all > 0 && all === checked);
-  });
+  updateSelectedCount();
+  //uncheck header select checkboxes if none were checked
+  const all = $("#dataTable tbody input.row-checkbox").length;
+  const checked = $("#dataTable tbody input.row-checkbox:checked").length;
+  $("#selectAll").prop("checked", all > 0 && all === checked);
 }
 
 //upload logo
@@ -104,6 +105,8 @@ btnUpload.on("change", function (event) {
 
       assignHeaders(json[0], json);
 
+      headers = columns;
+
       headers.forEach((data) => {
         colData.push({
           title: data,
@@ -119,6 +122,7 @@ btnUpload.on("change", function (event) {
         const headRow = $("#tableHeadRow");
         columns.forEach((data) => headRow.append(`<th>${data}</th>`));
         dataTable.append("<tbody></tbody>");
+        $("#selectAll").on("change", toggleSelectAll);
       }
 
       const propertyNumberIndex = columns.indexOf("Property Number");
@@ -135,8 +139,7 @@ btnUpload.on("change", function (event) {
         scrollX: true,
         autoWidth: false,
       });
-      toggleSelectAll();
-      delegateCheckBox();
+      $("#dataTable tbody").on("change", "input.row-checkbox", delegateCheckBox);
       updateSelectedCount();
     } catch (err) {
       console.log(err);

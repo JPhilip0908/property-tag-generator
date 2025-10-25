@@ -1,6 +1,6 @@
 "use strict";
 
-import { defaultTable, colData } from "./modules/table-object.js";
+import { defaultTable } from "./modules/table-object.js";
 
 let wbData = null;
 let currentData = null;
@@ -16,6 +16,7 @@ let logoDataURL = null;
 let logoPreview = $("#logoPreview");
 const columns = ["Property Number", "Asset Item", "Manufacturer", "Model", "Serial Number", "Cost of Acquisition", "Date of Acquisition", "Date Issued", "Name of Accountable Officer", "Asset Location", "Current Condition"];
 let headers = [];
+
 table = dataTable.DataTable(defaultTable());
 
 //select all rows when checked
@@ -105,10 +106,21 @@ btnUpload.on("change", function (event) {
 
       assignHeaders(json[0], json);
 
+      const cols = [
+        {
+          data: null,
+          orderable: false,
+          searchable: false,
+          render: function (data, type, row, meta) {
+            return '<input type="checkbox" class="row-checkbox" data-rowid="' + row.__rowId + '">';
+          },
+        },
+      ];
+
       headers = columns;
 
       headers.forEach((data) => {
-        colData.push({
+        cols.push({
           title: data,
           data: data,
           defaultContent: "",
@@ -123,12 +135,13 @@ btnUpload.on("change", function (event) {
         columns.forEach((data) => headRow.append(`<th>${data}</th>`));
         dataTable.append("<tbody></tbody>");
         $("#selectAll").on("change", toggleSelectAll);
+        $("#dataTable tbody").on("change", "input.row-checkbox", delegateCheckBox);
       }
 
       const propertyNumberIndex = columns.indexOf("Property Number");
       table = $("#dataTable").DataTable({
         data: currentData,
-        columns: colData.map((col, idx) => {
+        columns: cols.map((col, idx) => {
           // idx-1 because first column is checkbox column
           return Object.assign({}, col, { className: "no-wrap" });
 
@@ -139,7 +152,7 @@ btnUpload.on("change", function (event) {
         scrollX: true,
         autoWidth: false,
       });
-      $("#dataTable tbody").on("change", "input.row-checkbox", delegateCheckBox);
+
       updateSelectedCount();
     } catch (err) {
       console.log(err);

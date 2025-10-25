@@ -1,18 +1,16 @@
-export const colData = [
-  {
-    data: null,
-    orderable: false,
-    searchable: false,
-    render: function (data, type, row, meta) {
-      return '<input type="checkbox" class="row-checkbox" data-rowid="' + row.__rowId + '">';
-    },
-  },
-];
-
 export const defaultTable = function () {
   return {
     data: [],
-    columns: colData,
+    columns: [
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row, meta) {
+          return '<input type="checkbox" class="row-checkbox" data-rowid="' + row.__rowId + '">';
+        },
+      },
+    ],
     order: [],
     pageLength: 10,
     language: {

@@ -177,8 +177,30 @@ btnGenerate.on("click", function (event) {
   openTagsWindow(data, headers, selectedRows);
 });
 
-function openTagsWindow(data, columns, rows) {}
+function openTagsWindow(data, columns, rows) {
+  const pageSettings = getPageSettings();
+}
 
+function getPageSettings() {
+  const size = $("#pageSize").val();
+  const orientation = $("#pageOrientation").val();
+  let width = 8.27;
+  let height = 11.69;
+
+  if (size === "letter") {
+    width = 8.5;
+    height = 11;
+  } else if (size === "folio") {
+    width = 8.5;
+    height = 13;
+  } else {
+    width = parseFloat($("#customWidth").val()) || 8.27;
+    height = parseFloat($("#customHeigh").val()) || 11.69;
+  }
+
+  if (orientation === "landscape") [width, height] = [height, width];
+  return { width, height, unit: "in", orientation };
+}
 function createData(filteredJSON) {
   currentData = filteredJSON.map((row, index) => {
     const clone = Object.assign({}, row);

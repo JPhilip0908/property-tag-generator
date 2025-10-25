@@ -5,9 +5,6 @@ import { defaultTable } from "./modules/table-object.js";
 let wbData = null;
 let currentData = null;
 let table = null;
-let school = $.trim($("#schoolName").val());
-let validator = $.trim($("#validatorName").val());
-let position = $.trim($("#position").val());
 const btnLogo = $("#logoUpload");
 const btnDownload = $("#downloadTemplate");
 const btnUpload = $("#xlsxUpload");
@@ -155,7 +152,32 @@ btnDownload.on("click", function (event) {
 //generate property tag
 btnGenerate.on("click", function (event) {
   event.preventDefault();
+
+  const data = {
+    school: $.trim($("#validatorName").val()),
+    validator: $.trim($("#validatorName").val()),
+    position: (position = $.trim($("#position").val())),
+    logo: logoDataURL,
+  };
+
+  const selectedCheckboxes = Array.from($("#dataTable tbody input.row-checkbox:checked"));
+  if (selectedCheckboxes.length === 0 && selectedCheckboxes.length < 6) {
+    alert("Please select at least 6 rows to generate property tags ");
+    return;
+  }
+
+  const selectedRows = selectedCheckboxes
+    .map(function () {
+      const rowId = $(this).data("rowid"); // ✅ correct jQuery way
+      return currentData.find((r) => r.__rowId === rowId);
+    })
+    .get()
+    .filter(Boolean);
+
+  openTagsWindow(data, headers, selectedRows);
 });
+
+function openTagsWindow(data, columns, rows) {}
 
 function createData(filteredJSON) {
   currentData = filteredJSON.map((row, index) => {

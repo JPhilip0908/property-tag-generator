@@ -137,11 +137,11 @@ btnUpload.on("change", function (event) {
 
 btnDownload.on("click", function () {
   //path of the template
-  const filePath = "template/Asset Registry for Property Tag Template.xlsk";
+  const filePath = "template/template.xlsx";
 
   const link = $("<a>").prop({
     href: filePath,
-    download: "Asset Registry for Property Tag Template.xlsx",
+    download: "template.xlsx",
   });
   $("body").append(link);
   link[0].click();

@@ -11,6 +11,7 @@ let position = $.trim($("#position").val());
 const btnLogo = $("#logoUpload");
 const btnDownload = $("#downloadTemplate");
 const btnUpload = $("#xlsxUpload");
+const btnGenerate = $("#generatePropertyTag");
 const dataTable = $("#dataTable");
 let logoDataURL = null;
 let logoPreview = $("#logoPreview");
@@ -21,6 +22,7 @@ table = dataTable.DataTable(defaultTable());
 
 //upload logo
 btnLogo.on("change", function (event) {
+  event.preventDefault();
   const file = event.target.files && event.target.files[0];
   if (!file) {
     logoPreview.text("Logo");
@@ -42,6 +44,7 @@ btnLogo.on("change", function (event) {
 
 //upload excel file
 btnUpload.on("change", function (event) {
+  event.preventDefault();
   const file = event.target.files && event.target.files[0];
 
   if (!file) return;
@@ -135,7 +138,8 @@ btnUpload.on("change", function (event) {
   reader.readAsArrayBuffer(file);
 });
 
-btnDownload.on("click", function () {
+btnDownload.on("click", function (event) {
+  event.preventDefault();
   //path of the template
   const filePath = "template/template.xlsx";
 
@@ -146,6 +150,11 @@ btnDownload.on("click", function () {
   $("body").append(link);
   link[0].click();
   link.remove();
+});
+
+//generate property tag
+btnGenerate.on("click", function (event) {
+  event.preventDefault();
 });
 
 function createData(filteredJSON) {

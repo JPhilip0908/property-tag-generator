@@ -135,6 +135,19 @@ btnUpload.on("change", function (event) {
   reader.readAsArrayBuffer(file);
 });
 
+btnDownload.on("click", function () {
+  //path of the template
+  const filePath = "template/Asset Registry for Property Tag Template.xlsk";
+
+  const link = $("<a>").prop({
+    href: filePath,
+    download: "Asset Registry for Property Tag Template.xlsx",
+  });
+  $("body").append(link);
+  link[0].click();
+  link.remove();
+});
+
 function createData(filteredJSON) {
   currentData = filteredJSON.map((row, index) => {
     const clone = Object.assign({}, row);

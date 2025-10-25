@@ -8,8 +8,8 @@ let table = null;
 let school = $.trim($("#schoolName").val());
 let validator = $.trim($("#validatorName").val());
 let position = $.trim($("#position").val());
-const chkSelectAll = $("#selectAll");
 const btnLogo = $("#logoUpload");
+const btnDownload = $("#downloadTemplate");
 const btnUpload = $("#xlsxUpload");
 const dataTable = $("#dataTable");
 let logoDataURL = null;
@@ -18,30 +18,6 @@ const columns = ["Property Number", "Asset Item", "Manufacturer", "Model", "Seri
 let headers = [];
 
 table = dataTable.DataTable(defaultTable());
-
-//select all rows when checked
-function toggleSelectAll(event) {
-  const checked = $(this).is(":checked");
-  $("#dataTable tbody input.row-checkbox").prop("checked", checked).trigger("change");
-  console.log("chkSelectAll length:", $("#selectAll").length);
-  console.log("type of toggleSelectAll:", typeof toggleSelectAll);
-  console.log("is arrow function? try toggleSelectAll.prototype:", toggleSelectAll.prototype);
-}
-//update selected count
-function updateSelectedCount() {
-  const count = $("#dataTable tbody input.row-checkbox:checked").length;
-  $("#selectedCount").text(count + " selected");
-}
-
-$("#dataTable tbody").on("change", "input.row-checkbox", delegateCheckBox);
-
-function delegateCheckBox() {
-  updateSelectedCount();
-  //uncheck header select checkboxes if none were checked
-  const all = $("#dataTable tbody input.row-checkbox").length;
-  const checked = $("#dataTable tbody input.row-checkbox:checked").length;
-  $("#selectAll").prop("checked", all > 0 && all === checked);
-}
 
 //upload logo
 btnLogo.on("change", function (event) {
@@ -165,4 +141,26 @@ function createData(filteredJSON) {
     clone._rowId = `r${index + 1}_${Date.now()}`;
     return clone;
   });
+}
+//update selected count
+function updateSelectedCount() {
+  const count = $("#dataTable tbody input.row-checkbox:checked").length;
+  $("#selectedCount").text(count + " selected");
+}
+
+function delegateCheckBox() {
+  updateSelectedCount();
+  //uncheck header select checkboxes if none were checked
+  const all = $("#dataTable tbody input.row-checkbox").length;
+  const checked = $("#dataTable tbody input.row-checkbox:checked").length;
+  $("#selectAll").prop("checked", all > 0 && all === checked);
+}
+
+//select all rows when checked
+function toggleSelectAll(event) {
+  const checked = $(this).is(":checked");
+  $("#dataTable tbody input.row-checkbox").prop("checked", checked).trigger("change");
+  console.log("chkSelectAll length:", $("#selectAll").length);
+  console.log("type of toggleSelectAll:", typeof toggleSelectAll);
+  console.log("is arrow function? try toggleSelectAll.prototype:", toggleSelectAll.prototype);
 }

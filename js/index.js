@@ -179,6 +179,25 @@ btnGenerate.on("click", function (event) {
 
 function openTagsWindow(data, columns, rows) {
   const pageSettings = getPageSettings();
+  const width = pageSettings.width;
+  const height = pageSettings.height;
+  const orientation = pageSettings.orientation;
+
+  //tag size in cm
+  const tagWidth = 10;
+  const tagHeight = 8;
+
+  const gap = 0.3;
+  const marginTop = 0.5;
+  const marginSide = 0.3;
+  const pageWidthInCm = width * 2.54;
+  const pageHeightInCm = height * 2.54;
+
+  const usableW = pageWidthInCm - marginSide * 2 + gap;
+  const usableH = pageHeightInCm - marginTop * 2 + gap;
+  const cols = Math.floor(usableW / (tagWidth + gap));
+  const rowsPerPage = Math.floor(usableH / (tagHeight + gap));
+  const logoSrc = data.logo;
 }
 
 function getPageSettings() {

@@ -104,8 +104,6 @@ btnUpload.on("change", function (event) {
 
       createData(filteredJSON);
 
-      assignHeaders(json[0], json);
-
       const cols = [
         {
           data: null,
@@ -166,11 +164,5 @@ function createData(filteredJSON) {
     const clone = Object.assign({}, row);
     clone._rowId = `r${index + 1}_${Date.now()}`;
     return clone;
-  });
-}
-function assignHeaders(data, json) {
-  headers = Object.keys(data);
-  headers = headers.filter((header) => {
-    return json.some((row) => row[header] !== null && row[header] !== "");
   });
 }

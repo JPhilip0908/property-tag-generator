@@ -237,11 +237,11 @@ export const menuBar = function (length) {
   <div class="toolbar">
     <button id="print">Print</button>
     <button id="download">Download PDF</button>
-    <span style="margin-left:auto;">Total Tags: ${rows.length}</span>
+    <span style="margin-left:auto;">Total Tags: ${length}</span>
   </div>`;
 };
 
-export const script = function (width, height) {
+export const script = function (width, height, orientation) {
   return `<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     // shrink model text only (never expand box)

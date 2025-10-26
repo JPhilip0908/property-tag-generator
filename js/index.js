@@ -1,7 +1,7 @@
 "use strict";
 
-import { defaultTable } from "./modules/table-object.js";
 import { propertyTagCSS, buildTag, menuBar, script } from "./modules/html-content.js";
+
 let wbData = null;
 let currentData = null;
 let table = null;
@@ -95,8 +95,6 @@ btnUpload.on("change", function (event) {
         return filtered;
       });
 
-      createData(filteredJSON);
-
       const cols = [
         {
           data: null,
@@ -109,6 +107,12 @@ btnUpload.on("change", function (event) {
       ];
 
       headers = columns;
+
+      currentData = json.map((r, idx) => {
+        const clone = Object.assign({}, r);
+        clone.__rowId = "r" + (idx + 1) + "_" + Date.now();
+        return clone;
+      });
 
       headers.forEach((data) => {
         cols.push({
@@ -177,19 +181,22 @@ btnGenerate.on("click", function (event) {
     logo: logoDataURL,
   };
 
-  const selectedCheckboxes = Array.from($("#dataTable tbody input.row-checkbox:checked"));
-  if (selectedCheckboxes.length === 0 && selectedCheckboxes.length < 6) {
-    alert("Please select at least 6 rows to generate property tags ");
+  const selectedCheckboxes = $("#dataTable tbody input.row-checkbox:checked");
+
+  if (selectedCheckboxes.length < 6) {
+    alert("Please select at least 6 rows to generate property tags");
     return;
   }
 
   const selectedRows = selectedCheckboxes
     .map(function () {
-      const rowId = $(this).data("rowid"); // ✅ correct jQuery way
+      const rowId = $(this).data("rowid");
       return currentData.find((r) => r.__rowId === rowId);
     })
     .get()
     .filter(Boolean);
+
+  console.log(selectedRows);
 
   openTagsWindow(data, headers, selectedRows);
 });
@@ -205,7 +212,7 @@ function openTagsWindow(data, columns, rows) {
   const tagHeight = 8;
 
   const gap = 0.3;
-  const marginTop = 0.5;
+  const marginTop = 0.3;
   const marginSide = 0.3;
   const pageWidthInCm = width * 2.54;
   const pageHeightInCm = height * 2.54;
@@ -226,16 +233,15 @@ function openTagsWindow(data, columns, rows) {
   const esc = (v) => (!v ? "" : String(v).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])));
 
   let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Property Tag Preview</title>${style}</head><body>`;
-  html += menuBar;
+  html += menuBar(rows.length);
   html += `<div class="pages">`;
   for (let i = 0; i < rows.length; i += cols * rowsPerPage) {
     const slice = rows.slice(i, i + cols * rowsPerPage);
-    html += `<div class = "page>${slice.map(buildTag(data, esc)).join("")}`;
+    html += `<div class = "page">${slice.map(buildTag(data, esc)).join("")}`;
   }
   html += `</div>`;
-  html += script(width, height);
+  html += script(width, height, orientation);
   html += `</body></html>`;
-
   win.document.open();
   win.document.writeln(html);
   win.document.close();

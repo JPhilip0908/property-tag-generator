@@ -1,6 +1,6 @@
 "use strict";
 
-import { propertyTagCSS, buildTag, menuBar, script } from "./modules/html-content.js";
+import { propertyTagCSS, buildTag, qrTagCSS, menuBar, script, buildQRTag } from "./modules/html-content.js";
 let wbData = null;
 let currentData = null;
 let table = null;
@@ -9,6 +9,7 @@ const btnDownload = $("#downloadTemplate");
 const btnUpload = $("#xlsxUpload");
 const btnGenerate = $("#generatePropertyTag");
 const dataTable = $("#dataTable");
+const btnGenerateQR = $("#generateQRTag");
 let logoDataURL = null;
 let logoPreview = $("#logoPreview");
 const columns = ["Property Number", "Asset Item", "Manufacturer", "Model", "Serial Number", "Cost of Acquisition", "Date of Acquisition", "Date Issued", "Name of Accountable Officer", "Asset Location", "Current Condition"];
@@ -28,6 +29,10 @@ table = dataTable.DataTable({
   ],
   order: [],
   pageLength: 10,
+  lengthMenu: [
+    [10, 25, 50, 100, 250, 500, 1000],
+    [10, 25, 50, 100, 250, 500, 1000],
+  ],
   language: {
     emptyTable: "No data loaded. Upload an .xlsx file to populate the table.",
   },
@@ -143,6 +148,10 @@ btnUpload.on("change", function (event) {
         }),
         order: [],
         pageLength: 10,
+        lengthMenu: [
+          [10, 25, 50, 100, 250, 500, 1000],
+          [10, 25, 50, 100, 250, 500, 1000],
+        ],
         scrollX: true,
         autoWidth: false,
       });
@@ -187,21 +196,11 @@ btnGenerate.on("click", function (event) {
   const selectedCheckboxes = $("#dataTable tbody input.row-checkbox:checked");
 
   if (selectedCheckboxes.length < 6) {
-    Swal.fire("Please select at least 6 rows to generate property tags");
+    Swal.fire("Error", "Please select at least 6 rows to generate property tags", "error");
     return;
   }
 
-  const selectedRows = selectedCheckboxes
-    .map(function () {
-      const rowId = $(this).data("rowid");
-      return currentData.find((r) => r.__rowId === rowId);
-    })
-    .get()
-    .filter(Boolean);
-
-  console.log(selectedRows);
-
-  openTagsWindow(data, headers, selectedRows);
+  openTagsWindow(data, headers, getSelectedRows(selectedCheckboxes));
 });
 
 function openTagsWindow(data, columns, rows) {
@@ -249,7 +248,12 @@ function openTagsWindow(data, columns, rows) {
   win.document.writeln(html);
   win.document.close();
 }
-
+$("#pageSize").on("change", function (event) {
+  event.preventDefault();
+  const isCustom = $(this).val() === "custom";
+  $("#customSizeInputs").css("display", isCustom ? "inline-flex" : "none");
+  // Trigger a live preview update if already open
+});
 function getPageSettings() {
   const size = $("#pageSize").val();
   const orientation = $("#pageOrientation").val();
@@ -263,8 +267,8 @@ function getPageSettings() {
     width = 8.5;
     height = 13;
   } else {
-    width = parseFloat($("#customWidth").val()) || 8.27;
-    height = parseFloat($("#customHeigh").val()) || 11.69;
+    width = parseFloat($("#customWidth").val());
+    height = parseFloat($("#customHeight").val());
   }
 
   if (orientation === "landscape") [width, height] = [height, width];
@@ -295,7 +299,62 @@ function delegateCheckBox() {
 function toggleSelectAll(event) {
   const checked = $(this).is(":checked");
   $("#dataTable tbody input.row-checkbox").prop("checked", checked).trigger("change");
-  console.log("chkSelectAll length:", $("#selectAll").length);
-  console.log("type of toggleSelectAll:", typeof toggleSelectAll);
-  console.log("is arrow function? try toggleSelectAll.prototype:", toggleSelectAll.prototype);
+}
+
+$("#generateQRTag").on("click", function (event) {
+  event.preventDefault();
+  const selectedCheckboxes = $("#dataTable tbody input.row-checkbox:checked");
+
+  if (selectedCheckboxes.length === 0) {
+    Swal.fire("Error", "Please select at least one row to generate QR tags.", "error");
+    return;
+  }
+
+  const data = {
+    school: $.trim($("#schoolName").val()),
+    validator: $.trim($("#validatorName").val()),
+    position: $.trim($("#position").val()),
+    logo: logoDataURL,
+  };
+
+  generateQRCodes(data, getSelectedRows(selectedCheckboxes));
+});
+
+async function generateQRCodes(data, rows) {
+  // open preview tab
+  const pageSettings = getPageSettings();
+  const w = window.open("", "_blank");
+  if (!w) {
+    Swal.fire("Error", "Popup blocked. Allow popups for this site.", "error");
+    return;
+  }
+
+  // tag physical size (inches -> cm for CSS)
+  const tagWidth = 1.37;
+  const tagHeight = 1.77;
+  const width = (tagWidth * 2.54).toFixed(4);
+  const height = (tagHeight * 2.54).toFixed(4);
+  const gap = 0.15;
+  const margin = 0.3;
+
+  // serialize rows & header safely
+  const rowsJson = JSON.stringify(rows).replace(/</g, "\\u003c");
+  const headerJson = JSON.stringify(data).replace(/</g, "\\u003c");
+
+  // HTML skeleton: rows & header passed as JSON, and a preview script that builds QR per row
+  const html = buildQRTag(qrTagCSS(width, height, margin, gap), rowsJson, headerJson, rows.length, pageSettings);
+  w.document.open();
+  w.document.writeln(html);
+  w.document.close();
+}
+
+function getSelectedRows(selectedCheckboxes) {
+  const selectedRows = selectedCheckboxes
+    .map(function () {
+      const rowId = $(this).data("rowid");
+      return currentData.find((r) => r.__rowId === rowId);
+    })
+    .get()
+    .filter(Boolean);
+  return selectedRows;
 }

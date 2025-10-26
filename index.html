@@ -67,6 +67,7 @@
         <div class="top-bar">
           <div style="display: flex; gap: 8px; align-items: center">
             <button id="generatePropertyTag">Generate Property Tag</button>
+            <button id="generateQRTag">Generate QR Tags</button>
             <div class="tag-count" id="selectedCount">0 selected</div>
           </div>
 
@@ -77,7 +78,7 @@
               <select id="pageSize">
                 <option value="a4">A4 (8.27 × 11.69 in)</option>
                 <option value="letter">Letter (8.5 × 11 in)</option>
-                <option value="legal">Legal (8.5 × 14 in)</option>
+                <option value="legal">Folio (8.5 × 13 in)</option>
                 <option value="custom">Custom</option>
               </select>
             </div>
@@ -125,6 +126,7 @@
 
     <!-- SheetJS for XLSX read/write -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
     <script defer type="module" src="/js/index.js"></script>
   </body>
 </html>

@@ -1,7 +1,6 @@
 "use strict";
 
 import { propertyTagCSS, buildTag, menuBar, script } from "./modules/html-content.js";
-
 let wbData = null;
 let currentData = null;
 let table = null;
@@ -63,7 +62,7 @@ btnUpload.on("change", function (event) {
 
   if (!file) return;
   if (!file.name.match(/\.xlsx$/i)) {
-    alert("Please upload an .xlsx file (Excel workbook).");
+    Swal.fire("Error", "Please upload an .xlsx file (Excel workbook).", "error");
     event.target.value = "";
     return;
   }
@@ -83,7 +82,7 @@ btnUpload.on("change", function (event) {
       });
 
       if (json.length === 0) {
-        alert("The first sheet contains no data");
+        Swal.fire("Error", "The first sheet contains no data", "error");
         return;
       }
 
@@ -150,7 +149,7 @@ btnUpload.on("change", function (event) {
 
       updateSelectedCount();
     } catch (err) {
-      console.log(err);
+      Swal.fire("Error", err.message, "error");
     }
   };
   reader.readAsArrayBuffer(file);
@@ -173,18 +172,22 @@ btnDownload.on("click", function (event) {
 //generate property tag
 btnGenerate.on("click", function (event) {
   event.preventDefault();
-
   const data = {
-    school: $.trim($("#validatorName").val()),
+    school: $.trim($("#schoolName").val()),
     validator: $.trim($("#validatorName").val()),
     position: $.trim($("#position").val()),
     logo: logoDataURL,
   };
 
+  if (Object.values(data).some((v) => !v)) {
+    Swal.fire("Error", "Please fill out all required fields before proceeding.", "error");
+    return;
+  }
+
   const selectedCheckboxes = $("#dataTable tbody input.row-checkbox:checked");
 
   if (selectedCheckboxes.length < 6) {
-    alert("Please select at least 6 rows to generate property tags");
+    Swal.fire("Please select at least 6 rows to generate property tags");
     return;
   }
 
@@ -224,7 +227,7 @@ function openTagsWindow(data, columns, rows) {
 
   const win = window.open("", "_blank");
   if (!win) {
-    alert("Popup blocked. Please allow popups for this site.");
+    Swal.fire("Error", "Popup blocked. Please allow popups for this site.", "error");
     return;
   }
   const style = propertyTagCSS(gap, marginTop, marginSide, cols);
@@ -237,7 +240,7 @@ function openTagsWindow(data, columns, rows) {
   html += `<div class="pages">`;
   for (let i = 0; i < rows.length; i += cols * rowsPerPage) {
     const slice = rows.slice(i, i + cols * rowsPerPage);
-    html += `<div class = "page">${slice.map(buildTag(data, esc)).join("")}`;
+    html += `<div class = "page">${slice.map(buildTag(data, esc)).join("")}</div>`;
   }
   html += `</div>`;
   html += script(width, height, orientation);

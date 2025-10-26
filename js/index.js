@@ -1,7 +1,7 @@
 "use strict";
 
 import { defaultTable } from "./modules/table-object.js";
-
+import { propertyTagCSS, buildTag, menuBar, script } from "./modules/html-content.js";
 let wbData = null;
 let currentData = null;
 let table = null;
@@ -15,7 +15,24 @@ let logoPreview = $("#logoPreview");
 const columns = ["Property Number", "Asset Item", "Manufacturer", "Model", "Serial Number", "Cost of Acquisition", "Date of Acquisition", "Date Issued", "Name of Accountable Officer", "Asset Location", "Current Condition"];
 let headers = [];
 
-table = dataTable.DataTable(defaultTable());
+table = dataTable.DataTable({
+  data: [],
+  columns: [
+    {
+      data: null,
+      orderable: false,
+      searchable: false,
+      render: function (data, type, row, meta) {
+        return '<input type="checkbox" class="row-checkbox" data-rowid="' + row.__rowId + '">';
+      },
+    },
+  ],
+  order: [],
+  pageLength: 10,
+  language: {
+    emptyTable: "No data loaded. Upload an .xlsx file to populate the table.",
+  },
+});
 
 //upload logo
 btnLogo.on("change", function (event) {
@@ -156,7 +173,7 @@ btnGenerate.on("click", function (event) {
   const data = {
     school: $.trim($("#validatorName").val()),
     validator: $.trim($("#validatorName").val()),
-    position: (position = $.trim($("#position").val())),
+    position: $.trim($("#position").val()),
     logo: logoDataURL,
   };
 
@@ -197,7 +214,31 @@ function openTagsWindow(data, columns, rows) {
   const usableH = pageHeightInCm - marginTop * 2 + gap;
   const cols = Math.floor(usableW / (tagWidth + gap));
   const rowsPerPage = Math.floor(usableH / (tagHeight + gap));
-  const logoSrc = data.logo;
+
+  const win = window.open("", "_blank");
+  if (!win) {
+    alert("Popup blocked. Please allow popups for this site.");
+    return;
+  }
+  const style = propertyTagCSS(gap, marginTop, marginSide, cols);
+
+  // escaping special characters to avoid html injection and rendering issues
+  const esc = (v) => (!v ? "" : String(v).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])));
+
+  let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Property Tag Preview</title>${style}</head><body>`;
+  html += menuBar;
+  html += `<div class="pages">`;
+  for (let i = 0; i < rows.length; i += cols * rowsPerPage) {
+    const slice = rows.slice(i, i + cols * rowsPerPage);
+    html += `<div class = "page>${slice.map(buildTag(data, esc)).join("")}`;
+  }
+  html += `</div>`;
+  html += script(width, height);
+  html += `</body></html>`;
+
+  win.document.open();
+  win.document.writeln(html);
+  win.document.close();
 }
 
 function getPageSettings() {

@@ -179,3 +179,99 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
     }
   </style>`;
 };
+
+export const buildTag = function (data, esc) {
+  return (r) => `
+  <div class="property-tag">
+    <div class="top">
+      <div class="logo">
+        ${data.logo ? `<img src="${data.logo}" alt="Logo">` : ""}
+        <div class="logo-text">DepEd - ${esc(data.school)}</div>
+      </div>
+      <div class="desc-container">
+        <div class="desc-box">
+          <div class="desc-label">Description of the property</div>
+          <div class="desc-content">${esc(r["Asset Item"] || r["Description"] || "")}</div>
+        </div>
+        <div class="meta-grid">
+          <div class="grid-cell">
+            <div class="label">Model Number</div>
+            <div class="data shrinkable model-cell">${esc(r["Model"] || "")}</div>
+          </div>
+          <div class="grid-cell col-right">
+            <div class="label">Serial Number</div>
+            <div class="data">${esc(r["Serial Number"] || r["Serial"] || "")}</div>
+          </div>
+          <div class="grid-cell row-bottom">
+            <div class="label">Date Acquired</div>
+            <div class="data">${esc(r["Date of Acquisition"] || "")}</div>
+          </div>
+          <div class="grid-cell col-right row-bottom">
+            <div class="label">Acquisition Cost</div>
+            <div class="data">Php ${esc(r["Cost of Acquisition"] || "")}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="label">Property Number</div>
+    <div class="property-number">${esc(r["Property Number"] || "")}</div>
+
+    <div class="label">Person Accountable</div>
+    <div class="person">${esc(r["Name of Accountable Officer"] || "")}</div>
+
+    <div class="date-issued label">Date Issued: <span>${esc(r["Date Issued"] || "")}</span></div>
+
+    <div class="label">Validated by:</div>
+    <div class="validated">
+      <div class="name">${esc(data.validator)}</div>
+      <div class="position">${esc(data.position)}</div>
+    </div>
+
+    <div class="footer">TAMPERING OF THIS LABEL IS PROHIBITED</div>
+  </div>`;
+};
+
+export const menuBar = function (length) {
+  return `
+  <div class="toolbar">
+    <button id="print">Print</button>
+    <button id="download">Download PDF</button>
+    <span style="margin-left:auto;">Total Tags: ${rows.length}</span>
+  </div>`;
+};
+
+export const script = function (width, height) {
+  return `<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    // shrink model text only (never expand box)
+    function shrinkIfOverflow(el, minPt = 6, step = 0.2) {
+      const parentW = el.parentElement.clientWidth - 2;
+      let cs = window.getComputedStyle(el);
+      let fontSize = parseFloat(cs.fontSize);
+      const minPx = (minPt * 96) / 72;
+      while (el.scrollWidth > parentW && fontSize > minPx) {
+        fontSize -= step;
+        el.style.fontSize = fontSize + 'px';
+      }
+    }
+    function applySmartShrink() {
+      document.querySelectorAll('.model-cell').forEach(el => shrinkIfOverflow(el, 6, 0.4));
+    }
+    applySmartShrink();
+    window.addEventListener('resize', applySmartShrink);
+
+    document.getElementById('print').addEventListener('click',()=>window.print());
+    document.getElementById('download').addEventListener('click',()=>{
+      const content=document.querySelector('.pages');
+      const opt={
+        margin:0,
+        filename:'Property_Tags.pdf',
+        image:{type:'jpeg',quality:0.98},
+        html2canvas:{scale:2,useCORS:true},
+        jsPDF:{unit:'in',format:[${width},${height}],orientation:'${orientation}'}
+      };
+      html2pdf().set(opt).from(content).save();
+    });
+  </script>`;
+};

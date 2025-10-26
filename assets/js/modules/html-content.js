@@ -50,7 +50,7 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
     .property-tag {
       width: var(--tag-w);
       height: var(--tag-h);
-      border: 3px solid #000;
+      border: 2.5px solid #000;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -64,7 +64,7 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
     }
     .logo {
       width: 1.5cm;
-      height: 3cm;
+      height: 3.4cm;
       border-right: 1px solid #000;
       display: flex;
       flex-direction: column;

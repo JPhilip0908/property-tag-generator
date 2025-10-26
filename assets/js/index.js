@@ -213,9 +213,9 @@ function openTagsWindow(data, columns, rows) {
   const tagWidth = 10;
   const tagHeight = 8;
 
-  const gap = 0.3;
+  const gap = 0.2;
   const marginTop = 0.3;
-  const marginSide = 0.3;
+  const marginSide = 0.4;
   const pageWidthInCm = width * 2.54;
   const pageHeightInCm = height * 2.54;
 

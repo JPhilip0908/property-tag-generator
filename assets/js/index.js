@@ -167,7 +167,7 @@ btnUpload.on("change", function (event) {
 btnDownload.on("click", function (event) {
   event.preventDefault();
   //path of the template
-  const filePath = "template/template.xlsx";
+  const filePath = "./assets/template/template.xlsx";
 
   const link = $("<a>").prop({
     href: filePath,

@@ -171,7 +171,7 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
       font-weight: 700;
       font-size: 10pt;
       border-top: 1px solid #000;
-      padding: 6px 0;
+      padding: 0;
     }
 
     @media print {

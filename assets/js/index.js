@@ -316,6 +316,10 @@ $("#generateQRTag").on("click", function (event) {
 });
 
 async function generateQRCodes(data, rows) {
+  if (Object.values(data).some((v) => !v)) {
+    Swal.fire("Error", "Please fill out all required fields before proceeding.", "error");
+    return;
+  }
   // open preview tab
   const pageSettings = getPageSettings();
   const w = window.open("", "_blank");

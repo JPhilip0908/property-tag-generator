@@ -205,6 +205,7 @@ btnGenerate.on("click", function (event) {
 
 function openTagsWindow(data, columns, rows) {
   const pageSettings = getPageSettings();
+  console.log(pageSettings);
   const width = pageSettings.width;
   const height = pageSettings.height;
   const orientation = pageSettings.orientation;
@@ -213,9 +214,9 @@ function openTagsWindow(data, columns, rows) {
   const tagWidth = 10;
   const tagHeight = 8;
 
-  const gap = 0.2;
-  const marginTop = 0.3;
-  const marginSide = 0.4;
+  const gap = 0.1;
+  const marginTop = 0.4;
+  const marginSide = 0.1;
   const pageWidthInCm = width * 2.54;
   const pageHeightInCm = height * 2.54;
 
@@ -252,8 +253,8 @@ $("#pageSize").on("change", function (event) {
   event.preventDefault();
   const isCustom = $(this).val() === "custom";
   $("#customSizeInputs").css("display", isCustom ? "inline-flex" : "none");
-  // Trigger a live preview update if already open
 });
+
 function getPageSettings() {
   const size = $("#pageSize").val();
   const orientation = $("#pageOrientation").val();
@@ -266,7 +267,7 @@ function getPageSettings() {
   } else if (size === "folio") {
     width = 8.5;
     height = 13;
-  } else {
+  } else if (size === "custom") {
     width = parseFloat($("#customWidth").val());
     height = parseFloat($("#customHeight").val());
   }
@@ -274,13 +275,7 @@ function getPageSettings() {
   if (orientation === "landscape") [width, height] = [height, width];
   return { width, height, unit: "in", orientation };
 }
-function createData(filteredJSON) {
-  currentData = filteredJSON.map((row, index) => {
-    const clone = Object.assign({}, row);
-    clone._rowId = `r${index + 1}_${Date.now()}`;
-    return clone;
-  });
-}
+
 //update selected count
 function updateSelectedCount() {
   const count = $("#dataTable tbody input.row-checkbox:checked").length;

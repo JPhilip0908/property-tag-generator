@@ -165,13 +165,22 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
       border-bottom: 1px solid #000;
     }
     .validated .name { font-weight: 700; font-size: 8pt; }
-    .validated .position { font-size: 7.5pt; }
+    .validated .position { 
+      font-size: 7.5pt;
+      line-height: 1.1;
+      white-space: normal;         /* ✅ allow wrapping */
+      overflow-wrap: break-word;   /* ✅ wrap long phrases properly */
+      word-break: break-word;      /* ✅ break inside long words if needed */
+      text-align: center;          /* ✅ keep it centered like preview */
+      max-width: 100%;
+      display: inline-block; 
+    }
     .footer {
       text-align: center;
       font-weight: 700;
       font-size: 10pt;
       border-top: 1px solid #000;
-      padding: 0;
+      padding: 0.2px;
     }
 
     @media print {
@@ -276,13 +285,23 @@ export const script = function (width, height, orientation) {
       document.querySelectorAll('.model-cell').forEach(el => shrinkIfOverflow(el, 6, 0.4));
     }
     applySmartShrink();
+
+    // ✅ Extra shrink function for validator position
+    function shrinkValidatorPosition() {
+      document.querySelectorAll('.validated .position').forEach(el => {
+        shrinkIfOverflow(el, 6, 0.4);
+      });
+    }
+
+    shrinkValidatorPosition();
     window.addEventListener('resize', applySmartShrink);
 
     document.getElementById('print').addEventListener('click',()=>window.print());
     document.getElementById('download').addEventListener('click',()=>{
       const content=document.querySelector('.pages');
+      
       const opt={
-        margin:0,
+       margin: [0.3, 0, 0.1, 0.1],
         filename:'Property_Tags.pdf',
         image:{type:'jpeg',quality:0.98},
         html2canvas:{scale:2,useCORS:true},

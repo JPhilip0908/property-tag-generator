@@ -338,7 +338,7 @@ export const buildQRTag = function (qrTagCSS, rowsJson, headerJson, length, page
         return [
           'Description: ' + (r['Asset Item']||r['Description']||''),
           'Model Number: ' + (r['Model']||''),
-          'Serial Number: ' + (r['SerialNumber']||r['Serial']||''),
+          'Serial Number: ' + (r['Serial Number']||r['Serial']||''),
           'Acquisition Cost: ' + (r['Cost of Acquisition']||''),
           'Date of Acquisition: ' + (r['Date of Acquisition']||''),
           'Property Number: ' + (r['Property Number']||''),

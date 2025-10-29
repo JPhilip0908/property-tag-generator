@@ -2,7 +2,9 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
   return `
   <style>
     :root {
-      --tag-w: 10cm;
+      // --tag-w: 10cm;
+      // --tag-h: 8cm;
+      --tag-w: 9.4cm;
       --tag-h: 8cm;
     }
     html, body {
@@ -60,11 +62,11 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
     .top {
       display: flex;
       border-bottom: 1px solid #000;
-      height: 3.8cm;
+      height: 3.4cm;
     }
     .logo {
       width: 1.5cm;
-      height: 3.4cm;
+      // height: 3.4cm;
       border-right: 1px solid #000;
       display: flex;
       flex-direction: column;
@@ -143,7 +145,8 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
       font-weight: 700;
       font-size: 10pt;
       border-bottom: 1px solid #000;
-      padding: 6px 0;
+      // padding: 6px 0;
+      padding: 6.5px 0;
     }
     .person {
       text-align: center;
@@ -154,7 +157,8 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
     }
     .date-issued {
       font-size: 7pt;
-      padding: 6px 8px 8px 0px;
+      // padding: 6px 8px 8px 0px;
+      padding: 6px 8px 6px 0px;
       border-bottom: 1px solid #000;
       text-align: left;
     }
@@ -178,7 +182,8 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
     .footer {
       text-align: center;
       font-weight: 700;
-      font-size: 10pt;
+      // font-size: 10pt;
+      font-size: 11pt;
       border-top: 1px solid #000;
       padding: 0.2px;
     }

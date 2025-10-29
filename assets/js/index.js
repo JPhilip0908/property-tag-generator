@@ -211,10 +211,10 @@ function openTagsWindow(data, columns, rows) {
   const orientation = pageSettings.orientation;
 
   //tag size in cm
-  const tagWidth = 10;
+  const tagWidth = 9.4;
   const tagHeight = 8;
 
-  const gap = 0.1;
+  const gap = 0.3;
   const marginTop = 0.4;
   const marginSide = 0.1;
   const pageWidthInCm = width * 2.54;
@@ -296,7 +296,7 @@ function toggleSelectAll(event) {
   $("#dataTable tbody input.row-checkbox").prop("checked", checked).trigger("change");
 }
 
-$("#generateQRTag").on("click", function (event) {
+btnGenerateQR.on("click", function (event) {
   event.preventDefault();
   const selectedCheckboxes = $("#dataTable tbody input.row-checkbox:checked");
 

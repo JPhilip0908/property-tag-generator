@@ -34,7 +34,7 @@ table = dataTable.DataTable({
     [10, 25, 50, 100, 250, 500, 1000],
   ],
   language: {
-    emptyTable: "No data loaded. Upload an .xlsx file to populate the table.",
+    emptyTable: "No data loaded. Upload the file first to populate the table.",
   },
 });
 

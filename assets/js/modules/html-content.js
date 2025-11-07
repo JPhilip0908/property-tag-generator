@@ -341,7 +341,7 @@ export const buildQRTag = function (qrTagCSS, rowsJson, headerJson, length, page
       // Build the textual payload encoded into the QR (plain text)
       function buildQRData(r){
         return [
-          'Description: ' + (r['Description for Property Tag']||r['Description']||''),
+          'Description: ' + (r['Description for Property Tag']||r['Asset Item']||''),
           'Model Number: ' + (r['Model']||''),
           'Serial Number: ' + (r['Serial Number']||r['Serial']||''),
           'Acquisition Cost: ' + (r['Cost of Acquisition']||''),

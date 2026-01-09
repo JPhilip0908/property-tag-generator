@@ -1,4 +1,4 @@
-export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
+export const propertyTagCSS = function (gap, marginTop, marginSide, cols, rowsPerPage) {
   return `
   <style>
     :root {
@@ -37,15 +37,16 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
       padding: ${marginTop}cm ${marginSide}cm;
       display: flex;
       flex-direction: column;
-      gap: ${gap}cm;
+      gap: 0;
     }
     .page {
       display: grid;
       grid-template-columns: repeat(${cols}, var(--tag-w));
-      grid-auto-rows: var(--tag-h);
+      grid-template-rows: repeat(${rowsPerPage}, var(--tag-h));
       gap: ${gap}cm;
       page-break-after: always;
       justify-content: center;
+      margin-bottom: ${gap}cm;
     }
 
     /* ===== PROPERTY TAG TEMPLATE ===== */
@@ -273,7 +274,7 @@ export const menuBar = function (length) {
   </div>`;
 };
 
-export const script = function (width, height, orientation) {
+export const script = function (width, height, orientation, rowsPerPage) {
   return `<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     // shrink model text only (never expand box)

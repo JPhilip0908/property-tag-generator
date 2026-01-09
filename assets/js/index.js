@@ -220,19 +220,18 @@ function openTagsWindow(data, columns, rows) {
   const pageWidthInCm = width * 2.54;
   const pageHeightInCm = height * 2.54;
 
-  const usableW = pageWidthInCm - marginSide * 2 + gap;
-  const usableH = pageHeightInCm - marginTop * 2 + gap;
-  const cols = Math.floor(usableW / (tagWidth + gap));
-  const rowsPerPage = Math.floor(usableH / (tagHeight + gap));
+  const usableW = pageWidthInCm - marginSide * 2;
+  const usableH = pageHeightInCm - marginTop * 2;
+  const cols = Math.max(1, Math.floor((usableW + gap) / (tagWidth + gap)));
+  const rowsPerPage = Math.max(1, Math.floor((usableH + gap) / (tagHeight + gap)));
 
   const win = window.open("", "_blank");
   if (!win) {
     Swal.fire("Error", "Popup blocked. Please allow popups for this site.", "error");
     return;
   }
-  const style = propertyTagCSS(gap, marginTop, marginSide, cols);
+  const style = propertyTagCSS(gap, marginTop, marginSide, cols, rowsPerPage);
 
-  // escaping special characters to avoid html injection and rendering issues
   const esc = (v) => (!v ? "" : String(v).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])));
 
   let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Property Tag Preview</title>${style}</head><body>`;
@@ -243,7 +242,7 @@ function openTagsWindow(data, columns, rows) {
     html += `<div class = "page">${slice.map(buildTag(data, esc)).join("")}</div>`;
   }
   html += `</div>`;
-  html += script(width, height, orientation);
+  html += script(width, height, orientation, rowsPerPage);
   html += `</body></html>`;
   win.document.open();
   win.document.writeln(html);

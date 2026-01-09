@@ -270,6 +270,7 @@ function getPageSettings() {
   } else if (size === "custom") {
     width = parseFloat($("#customWidth").val());
     height = parseFloat($("#customHeight").val());
+    return { width, height, unit: "in", orientation };
   }
 
   if (orientation === "landscape") [width, height] = [height, width];
@@ -320,7 +321,6 @@ async function generateQRCodes(data, rows) {
     Swal.fire("Error", "Please fill out all required fields before proceeding.", "error");
     return;
   }
-  // open preview tab
   const pageSettings = getPageSettings();
   const w = window.open("", "_blank");
   if (!w) {
@@ -328,7 +328,6 @@ async function generateQRCodes(data, rows) {
     return;
   }
 
-  // tag physical size (inches -> cm for CSS)
   const tagWidth = 1.37;
   const tagHeight = 1.77;
   const width = (tagWidth * 2.54).toFixed(4);
@@ -336,12 +335,18 @@ async function generateQRCodes(data, rows) {
   const gap = 0.15;
   const margin = 0.3;
 
-  // serialize rows & header safely
+  const pageWidthInCm = pageSettings.width * 2.54;
+  const pageHeightInCm = pageSettings.height * 2.54;
+
+  const usableW = pageWidthInCm - margin * 2;
+  const usableH = pageHeightInCm - margin * 2;
+  const cols = Math.max(1, Math.floor((usableW + gap) / (parseFloat(width) + gap)));
+  const rowsPerPage = Math.max(1, Math.floor((usableH + gap) / (parseFloat(height) + gap)));
+
   const rowsJson = JSON.stringify(rows).replace(/</g, "\\u003c");
   const headerJson = JSON.stringify(data).replace(/</g, "\\u003c");
 
-  // HTML skeleton: rows & header passed as JSON, and a preview script that builds QR per row
-  const html = buildQRTag(qrTagCSS(width, height, margin, gap), rowsJson, headerJson, rows.length, pageSettings);
+  const html = buildQRTag(qrTagCSS(width, height, margin, gap, cols, rowsPerPage), rowsJson, headerJson, rows.length, pageSettings, cols, rowsPerPage);
   w.document.open();
   w.document.writeln(html);
   w.document.close();

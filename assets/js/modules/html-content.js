@@ -91,7 +91,7 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
       flex-direction: column;
     }
     .desc-box {
-      padding: 3px 6px; /* ⬅ tighter top/left */
+      padding: 3px 6px;
       border-bottom: 1px solid #000;
       flex: 1.6;
       display: flex;
@@ -102,7 +102,7 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
       font-weight: 700;
       font-size: 7pt;
       text-align: left;
-      margin-bottom: 2px; /* ⬅ smaller spacing */
+      margin-bottom: 2px;
     }
 
     .desc-content {
@@ -169,15 +169,15 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
       border-bottom: 1px solid #000;
     }
     .validated .name { font-weight: 700; font-size: 8pt; }
-    .validated .position { 
+    .validated .position {
       font-size: 7.5pt;
       line-height: 1.1;
-      white-space: normal;         /* ✅ allow wrapping */
-      overflow-wrap: break-word;   /* ✅ wrap long phrases properly */
-      word-break: break-word;      /* ✅ break inside long words if needed */
-      text-align: center;          /* ✅ keep it centered like preview */
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      text-align: center;
       max-width: 100%;
-      display: inline-block; 
+      display: inline-block;
     }
     .footer {
       text-align: center;
@@ -195,18 +195,19 @@ export const propertyTagCSS = function (gap, marginTop, marginSide, cols) {
   </style>`;
 };
 
-export const qrTagCSS = function (width, height, margin, gap) {
+export const qrTagCSS = function (width, height, margin, gap, cols, rowsPerPage) {
   return `
     <style>
       html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:#fff}
       .toolbar{display:flex;gap:10px;padding:10px;background:#f7f7f7;border-bottom:1px solid #ccc;position:sticky;top:0;z-index:10}
       button{padding:6px 12px;border-radius:6px;border:0;cursor:pointer;font-weight:600}
       button#print{background:#2b6cb0;color:#fff} button#download{background:#4a5568;color:#fff}
-      .pages{padding:${margin}cm;display:flex;flex-wrap:wrap;gap:${gap}cm;justify-content:center}
-      .qr-tag{width:${width}cm;height:${height}cm;border:1px solid #000;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden}
+      .pages{padding:${margin}cm}
+      .page{display:grid;grid-template-columns:repeat(${cols},${width}cm);grid-template-rows:repeat(${rowsPerPage},${height}cm);gap:${gap}cm;margin-bottom:${gap}cm;page-break-after:always}
+      .qr-tag{width:${width}cm;height:${height}cm;border:1px solid #000;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;page-break-inside:avoid}
       canvas.qr{width:calc(${width}cm - 0.3cm);height:calc(${width}cm - 0.3cm);object-fit:contain}
       .property-number{font-size:6pt;text-align:center;margin-top:2px;word-break:break-word}
-      @media print { .toolbar{display:none!important} body{margin:0} }
+      @media print { .toolbar{display:none!important} .page{page-break-after:always} body{margin:0} }
     </style>
   `;
 };
@@ -291,7 +292,6 @@ export const script = function (width, height, orientation) {
     }
     applySmartShrink();
 
-    // ✅ Extra shrink function for validator position
     function shrinkValidatorPosition() {
       document.querySelectorAll('.validated .position').forEach(el => {
         shrinkIfOverflow(el, 6, 0.4);
@@ -317,7 +317,7 @@ export const script = function (width, height, orientation) {
   <\/script>`;
 };
 
-export const buildQRTag = function (qrTagCSS, rowsJson, headerJson, length, pageSettings) {
+export const buildQRTag = function (qrTagCSS, rowsJson, headerJson, length, pageSettings, cols, rowsPerPage) {
   return `<!doctype html><html><head><meta charset="utf-8"><title>QR Tags</title>${qrTagCSS}</head><body>
     <div class="toolbar">
       <button id="print">Print</button>
@@ -331,110 +331,110 @@ export const buildQRTag = function (qrTagCSS, rowsJson, headerJson, length, page
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
-      // bring serialized data into preview scope
-      const rows = ${rowsJson};
-      const headerObj = ${headerJson};
+      document.addEventListener('DOMContentLoaded', function() {
+        const rows = ${rowsJson};
+        const headerObj = ${headerJson};
+        const cols = ${cols};
+        const rowsPerPage = ${rowsPerPage};
 
-      // Safe esc for HTML text nodes
-      function esc(s){ if(s===null||s===undefined) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+        function esc(s){ if(s===null||s===undefined) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
-      // Build the textual payload encoded into the QR (plain text)
-      function buildQRData(r){
-        return [
-          'Description: ' + (r['Description for Property Tag']||r['Asset Item']||''),
-          'Model Number: ' + (r['Model']||''),
-          'Serial Number: ' + (r['Serial Number']||r['Serial']||''),
-          'Acquisition Cost: ' + (r['Cost of Acquisition']||''),
-          'Date of Acquisition: ' + (r['Date of Acquisition']||''),
-          'Property Number: ' + (r['Property Number']||''),
-          'Date Issued: ' + (r['Date Issued']||''),
-          'Accountable Officer: ' + (r['Name of Accountable Officer']||''),
-          'Validator: ' + (headerObj.validator||''),
-          'Position: ' + (headerObj.position||''),
-          'Current Condition: ' + (r['Current Condition']||'')
-        ].join('\\n');
-      }
+        function buildQRData(r){
+          return [
+            'Description: ' + (r['Description for Property Tag']||r['Asset Item']||''),
+            'Model Number: ' + (r['Model']||''),
+            'Serial Number: ' + (r['Serial Number']||r['Serial']||''),
+            'Acquisition Cost: ' + (r['Cost of Acquisition']||''),
+            'Date of Acquisition: ' + (r['Date of Acquisition']||''),
+            'Property Number: ' + (r['Property Number']||''),
+            'Date Issued: ' + (r['Date Issued']||''),
+            'Accountable Officer: ' + (r['Name of Accountable Officer']||''),
+            'Validator: ' + (headerObj.validator||''),
+            'Position: ' + (headerObj.position||''),
+            'Current Condition: ' + (r['Current Condition']||'')
+          ].join('\\n');
+        }
 
-      // Build DOM for each QR tag
-      const pagesEl = document.getElementById('pages');
+        const pagesEl = document.getElementById('pages');
 
-      rows.forEach((r, i) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'qr-tag';
-        wrapper.innerHTML = '<canvas class="qr" id="qr_' + i + '"></canvas><div class="property-number" id="pn_' + i + '"></div>';
-        pagesEl.appendChild(wrapper);
-        document.getElementById('pn_' + i).innerText = esc(r['Property Number']||'');
-      });
+        for (let i = 0; i < rows.length; i += cols * rowsPerPage) {
+          const pageDiv = document.createElement('div');
+          pageDiv.className = 'page';
+          const slice = rows.slice(i, i + cols * rowsPerPage);
 
-      // Create QR images and overlay logo
-      awaitImagesAndDraw();
-
-      function awaitImagesAndDraw(){
-        // create QR for each canvas and optionally overlay logo (center)
-        rows.forEach((r,i)=>{
-          const canvas = document.getElementById('qr_' + i);
-          const qrText = buildQRData(r);
-
-          // create the QR into the canvas using QRious
-          const qr = new QRious({
-            element: canvas,
-            value: qrText,
-            size: 400, // start with large pixel size to preserve resolution
-            level: 'H',
-            background: 'white',
-            foreground: 'black'
+          slice.forEach((r, idx) => {
+            const globalIndex = i + idx;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'qr-tag';
+            wrapper.innerHTML = '<canvas class="qr" id="qr_' + globalIndex + '"></canvas><div class="property-number">' + esc(r['Property Number']||'') + '</div>';
+            pageDiv.appendChild(wrapper);
           });
 
-          // overlay logo (if present) onto the canvas center
-          if(headerObj.logo){
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.src = headerObj.logo;
-            img.onload = () => {
-              // draw at center  ---- ensure logo size fit and is passport-like but not too big
-              const overlayW = Math.floor(canvas.width * 0.20); // 20% of QR
-              const overlayH = Math.floor(canvas.height * 0.20);
-              const x = Math.floor((canvas.width - overlayW) / 2);
-              const y = Math.floor((canvas.height - overlayH) / 2);
-              // draw white rounded rect behind logo to improve scan reliability
-              const radius = 6;
-              ctx.fillStyle = '#fff';
-              roundRect(ctx, x - 4, y - 4, overlayW + 8, overlayH + 8, radius, true, false);
-              ctx.drawImage(img, x, y, overlayW, overlayH);
-            };
-            img.onerror = ()=>{ /* ignore logo load failure */ };
-          }
+          pagesEl.appendChild(pageDiv);
+        }
+
+        awaitImagesAndDraw();
+
+        function awaitImagesAndDraw(){
+          rows.forEach((r,i)=>{
+            const canvas = document.getElementById('qr_' + i);
+            if(!canvas) return;
+            const qrText = buildQRData(r);
+
+            const qr = new QRious({
+              element: canvas,
+              value: qrText,
+              size: 400,
+              level: 'H',
+              background: 'white',
+              foreground: 'black'
+            });
+
+            if(headerObj.logo){
+              const ctx = canvas.getContext('2d');
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.src = headerObj.logo;
+              img.onload = () => {
+                const overlayW = Math.floor(canvas.width * 0.20);
+                const overlayH = Math.floor(canvas.height * 0.20);
+                const x = Math.floor((canvas.width - overlayW) / 2);
+                const y = Math.floor((canvas.height - overlayH) / 2);
+                const radius = 6;
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, x - 4, y - 4, overlayW + 8, overlayH + 8, radius, true, false);
+                ctx.drawImage(img, x, y, overlayW, overlayH);
+              };
+              img.onerror = ()=>{ };
+            }
+          });
+        }
+
+        function roundRect(ctx, x, y, w, h, r, fill, stroke){
+          if (typeof r === 'undefined') r = 5;
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.arcTo(x + w, y, x + w, y + h, r);
+          ctx.arcTo(x + w, y + h, x, y + h, r);
+          ctx.arcTo(x, y + h, x, y, r);
+          ctx.arcTo(x, y, x + w, y, r);
+          ctx.closePath();
+          if (fill) { ctx.fill(); }
+          if (stroke) { ctx.stroke(); }
+        }
+
+        document.getElementById('print').addEventListener('click', ()=> window.print());
+        document.getElementById('download').addEventListener('click', ()=>{
+          const content = document.querySelector('.pages');
+          const opt = {
+            margin: 0,
+            filename: 'QR_Tags.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: [${pageSettings.width}, ${pageSettings.height}], orientation: '${pageSettings.orientation}' }
+          };
+          html2pdf().set(opt).from(content).save();
         });
-      }
-
-      // helper: rounded rect
-      function roundRect(ctx, x, y, w, h, r, fill, stroke){
-        if (typeof r === 'undefined') r = 5;
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.arcTo(x + w, y, x + w, y + h, r);
-        ctx.arcTo(x + w, y + h, x, y + h, r);
-        ctx.arcTo(x, y + h, x, y, r);
-        ctx.arcTo(x, y, x + w, y, r);
-        ctx.closePath();
-        if (fill) { ctx.fill(); }
-        if (stroke) { ctx.stroke(); }
-      }
-
-      // wire print & download
-      document.getElementById('print').addEventListener('click', ()=> window.print());
-      document.getElementById('download').addEventListener('click', ()=>{
-        const content = document.querySelector('.pages');
-        const opt = {
-          margin: 0,
-          filename: 'QR_Tags.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'in', format: ${JSON.stringify([pageSettings.height, pageSettings.width])}, orientation: '${pageSettings.orientation}' }
-        };
-        // html2pdf will paginate based on jsPDF format; pages already sized to inches/cm in CSS
-        html2pdf().set(opt).from(content).save();
       });
     </script>
   </body></html>`;
